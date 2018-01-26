@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 
@@ -8,7 +9,7 @@ import (
 )
 
 const htmlIndex = `<html><body>
-<a href="/StripeLogin">ConnectWithStripe</a>
+<a href="/stripeLogin">ConnectWithStripe</a>
 </body></html>`
 
 var (
@@ -16,20 +17,19 @@ var (
 		RedirectURL:  "http://localhost:65010/stripeCallback",
 		ClientID:     "ca_CASR50ZBlOjOnrdMaNoav2dcptY7MYx7",
 		ClientSecret: "sk_test_Ycr3oc8bxMC4HGYBE5e3ERaY",
-		Scopes:       []string{"read/write", "read_only"},
+		Scopes:       []string{"read_write"},
 		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://connect.stripe.com/oauth/authorizex",
-			TokenURL: "https://provider.com/o/oauth2/token",
+			AuthURL:  "https://connect.stripe.com/oauth/authorize",
+			TokenURL: "https://connect.stripe.com/oauth/token",
 		},
 	}
-	// Some random string, random for each request
 	oauthStateString = "random"
 )
 
 func main() {
 	http.HandleFunc("/", handleMain)
-	http.HandleFunc("/StripeLogin", handleStripeLogin)
-	http.HandleFunc("/StripeCallback", handleStripeCallback)
+	http.HandleFunc("/stripeLogin", handleStripeLogin)
+	http.HandleFunc("/stripeCallback", handleStripeCallback)
 	if err := http.ListenAndServe(":65010", nil); err != nil {
 		panic(err)
 	}
@@ -58,13 +58,11 @@ func handleStripeCallback(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
-	fmt.Printf("GOTT TOKEN == '%s'", token)
-}
+	var buffer bytes.Buffer
+	buffer.WriteString("GOT TOKEN ")
+	buffer.WriteString(token.AccessToken)
 
-func sayHello(w http.ResponseWriter, r *http.Request) {
-	// //   message := r.URL.Path
-	// //   message = strings.TrimPrefix(message, "/")
-	// message := "<a href=>Authenticate with reddit</a> "
-	// w.Write([]byte(message))
-	//[]string{"https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file"},
+	fmt.Printf("GOTT TOKEN == '%s'", token)
+
+	w.Write(buffer.Bytes())
 }
