@@ -1,4 +1,4 @@
-package oauth
+package oauth_test
 
 import (
 	"io/ioutil"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/pwlabs/paypal-poc"
+	. "github.com/pwlabs/paypal-poc/oauth"
 	"golang.org/x/oauth2"
 )
 
