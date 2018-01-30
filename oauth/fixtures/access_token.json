@@ -1,0 +1,9 @@
+{
+    "access_token": "sk_test_9WvIVtms8CUwpBasCiFKmB2y",
+    "livemode": false,
+    "refresh_token": "rt_CASXLvEVnP6tkmC3trnROWKeegvkqltO4oPTsql1ZbyxKEyD",
+    "token_type": "bearer",
+    "stripe_publishable_key": "pk_test_IMD3Cj6oPdrWA7VAzvDu1fDR",
+    "stripe_user_id": "acct_1Bm7XtB3JX9jwqwa",
+    "scope": "read_write"
+  }
