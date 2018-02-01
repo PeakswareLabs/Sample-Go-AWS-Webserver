@@ -8,7 +8,7 @@ import (
 
 func getOauthDev() *oauth2.Config {
 	return &oauth2.Config{
-		RedirectURL:  "http://localhost:65010/stripeCallback",
+		RedirectURL:  "http://localhost:65010/oauth/stripe_callback",
 		ClientID:     "ca_CASR50ZBlOjOnrdMaNoav2dcptY7MYx7",
 		ClientSecret: "sk_test_Ycr3oc8bxMC4HGYBE5e3ERaY",
 		Scopes:       []string{"read_write"},

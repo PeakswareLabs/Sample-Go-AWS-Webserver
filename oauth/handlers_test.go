@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pwlabs/paypal-poc"
 	. "github.com/pwlabs/paypal-poc/oauth"
+	"github.com/pwlabs/paypal-poc/testhelpers"
 	"golang.org/x/oauth2"
 )
 
@@ -48,7 +48,7 @@ func TestLoginHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/StripeLogin", nil)
 	var oauthConfig = getMockConfig("")
-	h := LoginHandler("random", oauthConfig)
+	h := LoginHandler()
 	h.ServeHTTP(rec, req)
 	if status := rec.Code; status != http.StatusTemporaryRedirect {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -78,7 +78,7 @@ func TestCallbackHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/stripeCallback", nil)
 	req.URL.RawQuery = "state=random&code=sampleblahcode"
-	h := CallbackHandler("random", oauthConfig)
+	h := CallbackHandler()
 	h.ServeHTTP(rec, req)
 
 	if status := rec.Code; status != http.StatusTemporaryRedirect {
