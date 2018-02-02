@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/PeakswareLabs/Go-Webserver/app"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/core"
-	"github.com/pwlabs/paypal-poc/app"
 )
 
 var reqAccessor *core.RequestAccessor

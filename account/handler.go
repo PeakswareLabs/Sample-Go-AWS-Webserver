@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pwlabs/paypal-poc/config"
-	"github.com/pwlabs/paypal-poc/oauth"
+	"github.com/PeakswareLabs/Go-Webserver/config"
+	"github.com/PeakswareLabs/Go-Webserver/oauth"
 	"golang.org/x/oauth2"
 )
 

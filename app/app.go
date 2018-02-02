@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pwlabs/paypal-poc/account"
-	"github.com/pwlabs/paypal-poc/config"
-	"github.com/pwlabs/paypal-poc/oauth"
+	"github.com/PeakswareLabs/Go-Webserver/account"
+	"github.com/PeakswareLabs/Go-Webserver/config"
+	"github.com/PeakswareLabs/Go-Webserver/oauth"
 )
 
 //Create and initialize all routes

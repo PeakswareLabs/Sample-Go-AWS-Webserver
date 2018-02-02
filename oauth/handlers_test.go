@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pwlabs/paypal-poc/config"
-	. "github.com/pwlabs/paypal-poc/oauth"
-	"github.com/pwlabs/paypal-poc/testhelpers"
+	"github.com/PeakswareLabs/Go-Webserver/config"
+	. "github.com/PeakswareLabs/Go-Webserver/oauth"
+	"github.com/PeakswareLabs/Go-Webserver/testhelpers"
 	"golang.org/x/oauth2"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
