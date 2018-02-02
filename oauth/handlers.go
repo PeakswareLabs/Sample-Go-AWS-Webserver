@@ -14,7 +14,7 @@ import (
 // MainPageHandler serves the simple html page
 func MainPageHandler(html string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/xhtml+xml")
+		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, html)
 	})
 }
@@ -58,7 +58,7 @@ func CallbackHandler(env *config.Env) http.Handler {
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-		w.Header().Set("Content-Type", "application/xhtml+xml")
+		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<p>Successfully Authorized Account <code>%s</code>. </p>
 		<p>Click <a href="/account?stripe_user_id=%s">here</a> to get account details.</p>
 		<p>Click <a href="/oauth/deauthorize?stripe_user_id=%s">here</a> to deauthorize.</p>
@@ -95,7 +95,7 @@ func DeauthorizeHandler(env *config.Env) http.Handler {
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<p>Success! Account <code>%s</code> is disconnected.</p>
 			<p>Click <a href="{url}">here</a> to restart the OAuth flow.</p>`, stripeUserID)
 	})
