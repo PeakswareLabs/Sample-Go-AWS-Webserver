@@ -14,14 +14,16 @@ import (
 // MainPageHandler serves the simple html page
 func MainPageHandler(html string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, html)
 	})
 }
 
 // LoginHandler redirects user to the oauth provider login page
 func LoginHandler(env *config.Env) http.Handler {
-	oauthConfig := GetStripeOauthConfig()
+	oauthConfig := env.OauthConfig
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		url := oauthConfig.AuthCodeURL("oauthStateString")
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	})
@@ -29,7 +31,7 @@ func LoginHandler(env *config.Env) http.Handler {
 
 // CallbackHandler gets the oauth token when called by auth provider
 func CallbackHandler(env *config.Env) http.Handler {
-	oauthConfig := GetStripeOauthConfig()
+	oauthConfig := env.OauthConfig
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		state := r.FormValue("state")
 		if state != "oauthStateString" {
@@ -56,7 +58,7 @@ func CallbackHandler(env *config.Env) http.Handler {
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, `<p>Successfully Authorized Account <code>%s</code>. </p>
 		<p>Click <a href="/account?stripe_user_id=%s">here</a> to get account details.</p>
 		<p>Click <a href="/oauth/deauthorize?stripe_user_id=%s">here</a> to deauthorize.</p>
@@ -66,7 +68,7 @@ func CallbackHandler(env *config.Env) http.Handler {
 
 // DeauthorizeHandler deauthorizes application with stripe and remvoes oauth token from db
 func DeauthorizeHandler(env *config.Env) http.Handler {
-	oauthConfig := GetStripeOauthConfig()
+	oauthConfig := env.OauthConfig
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		stripeUserID := r.FormValue("stripe_user_id")
 		if stripeUserID == "" {
@@ -93,7 +95,7 @@ func DeauthorizeHandler(env *config.Env) http.Handler {
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, `<p>Success! Account <code>%s</code> is disconnected.</p>
 			<p>Click <a href="{url}">here</a> to restart the OAuth flow.</p>`, stripeUserID)
 	})

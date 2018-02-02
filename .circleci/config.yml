@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build-and-test:
+    docker:
+       - image: circleci/golang:1.8
+    working_directory: ~/zfc
+    steps:
+      - checkout
+    - restore_cache:
+      keys:
+      - v2-dependencies-{{ checksum "Gopkg.lock" }}
+    - run:
+      name: install dependencies
+      command: |
+        go get -u github.com/golang/dep/cmd/dep
+        dep ensure
+    - save_cache:
+      paths:
+        - ./vendor
+      key: v2-dependencies-{{ checksum "Gopkg.lock" }}
+    - run: go test ./...
+    - run: ./deploy.sh
+
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build-and-test

@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SAM deployment
+Outputs:
+  OauthGoApi:
+    Description: URL for application
+    Export:
+      Name: SampleGoApp
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+Resources:
+  OauthGoFunction:
+    Properties:
+      CodeUri: build/deployment.zip
+      Environment:
+        Variables:
+          ENVIRONMENT: dev
+      Events: null
+      Handler: main
+      MemorySize: 128
+      Policies: AWSLambdaFullAccess
+      Events:
+        ProxyApiGreedy:
+          Properties:
+            Method: ANY
+            Path: /{proxy+}
+          Type: Api
+        ProxyApiRoot:
+          Properties:
+            Method: ANY
+            Path: /
+          Type: Api
+      Role: arn:aws:iam::956681526677:role/lambda_basic_execution
+      Runtime: go1.x
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-b3a7e6c7
+        SubnetIds:
+          - subnet-2fdf4872
+          - subnet-9eb724b1
+          - subnet-dd127fe2
+      Timeout: 3
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

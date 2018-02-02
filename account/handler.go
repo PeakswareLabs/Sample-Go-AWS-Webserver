@@ -14,7 +14,7 @@ import (
 
 // Handler redirects user to the oauth provider login page
 func Handler(env *config.Env) http.Handler {
-	oauthConfig := oauth.GetStripeOauthConfig()
+	oauthConfig := env.OauthConfig
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		stripeUserID := r.FormValue("stripe_user_id")
 		if stripeUserID == "" {
@@ -49,7 +49,7 @@ func Handler(env *config.Env) http.Handler {
 		if readErr != nil {
 			log.Fatal(readErr)
 		}
-
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write(body)
 	})
 }

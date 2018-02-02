@@ -7,9 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pwlabs/paypal-poc/config"
 	. "github.com/pwlabs/paypal-poc/oauth"
 	"github.com/pwlabs/paypal-poc/testhelpers"
 	"golang.org/x/oauth2"
+	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 func getMockConfig(host string) *oauth2.Config {
@@ -25,6 +27,15 @@ func getMockConfig(host string) *oauth2.Config {
 		},
 	}
 }
+
+//TODO: Refactor tests and use interface for DB
+// Test main for common setup and teardown
+// func TestMain(m *testing.M) {
+// 	setup()
+// 	retCode := m.Run()
+// 	tearDown()
+// 	os.Exit(retCode)
+// }
 
 //TestMainPageHandler tests the template being served
 func TesMainPageHandler(t *testing.T) {
@@ -46,9 +57,16 @@ func TesMainPageHandler(t *testing.T) {
 //TestLoginHandler tests the login path
 func TestLoginHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/StripeLogin", nil)
+	req := httptest.NewRequest("GET", "/oauth/stripeLogin", nil)
 	var oauthConfig = getMockConfig("")
-	h := LoginHandler()
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+	env := &config.Env{DB: db, OauthConfig: oauthConfig}
+
+	h := LoginHandler(env)
 	h.ServeHTTP(rec, req)
 	if status := rec.Code; status != http.StatusTemporaryRedirect {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -69,21 +87,33 @@ func TestCallbackHandler(t *testing.T) {
 	if err != nil {
 		t.Error("Unable to open fixture")
 	}
-	//Setup mock
+
+	//setup db mock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectExec("create table IF NOT EXISTS oauth").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("insert into oauth").WithArgs().WillReturnResult(sqlmock.NewResult(1, 1))
+
+	//Setup stripe mock
 	endpoint := testhelpers.MockEndPoint{URL: "/oauth/token", Message: raw}
 	server := endpoint.Stub()
 	defer server.Close()
-	var oauthConfig = getMockConfig(server.URL)
 
+	var oauthConfig = getMockConfig(server.URL)
+	env := &config.Env{DB: db, OauthConfig: oauthConfig}
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/stripeCallback", nil)
-	req.URL.RawQuery = "state=random&code=sampleblahcode"
-	h := CallbackHandler()
+	req := httptest.NewRequest("GET", "/oauth/stripe_callback", nil)
+	req.URL.RawQuery = "state=oauthStateString&code=sampleblahcode"
+	h := CallbackHandler(env)
 	h.ServeHTTP(rec, req)
 
-	if status := rec.Code; status != http.StatusTemporaryRedirect {
+	if status := rec.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusTemporaryRedirect)
+			status, http.StatusOK)
 	}
 
 	expected := oauthConfig.Endpoint.TokenURL
@@ -92,4 +122,7 @@ func TestCallbackHandler(t *testing.T) {
 			rec.Body.String(), expected)
 	}
 
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
