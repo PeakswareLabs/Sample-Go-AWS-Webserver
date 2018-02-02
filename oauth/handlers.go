@@ -12,10 +12,12 @@ import (
 )
 
 // MainPageHandler serves the simple html page
-func MainPageHandler(html string) http.Handler {
+func MainPageHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprintf(w, html)
+		fmt.Fprintf(w, `<html><body>
+			<a href="%s/oauth/stripeLogin">ConnectWithStripe</a>
+			</body></html>`, r.URL.Path)
 	})
 }
 
@@ -33,6 +35,7 @@ func LoginHandler(env *config.Env) http.Handler {
 func CallbackHandler(env *config.Env) http.Handler {
 	oauthConfig := env.OauthConfig
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		basepath := strings.Split(r.URL.Path, "stripe_callback")[0]
 		state := r.FormValue("state")
 		if state != "oauthStateString" {
 			fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", "oauthStateString", state)
@@ -60,9 +63,9 @@ func CallbackHandler(env *config.Env) http.Handler {
 		}
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<p>Successfully Authorized Account <code>%s</code>. </p>
-		<p>Click <a href="/account?stripe_user_id=%s">here</a> to get account details.</p>
-		<p>Click <a href="/oauth/deauthorize?stripe_user_id=%s">here</a> to deauthorize.</p>
-		`, userID, userID, userID)
+		<p>Click <a href="%s/account?stripe_user_id=%s">here</a> to get account details.</p>
+		<p>Click <a href="%s/oauth/deauthorize?stripe_user_id=%s">here</a> to deauthorize.</p>
+		`, userID, basepath, userID, basepath, userID)
 	})
 }
 
@@ -97,6 +100,6 @@ func DeauthorizeHandler(env *config.Env) http.Handler {
 		}
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<p>Success! Account <code>%s</code> is disconnected.</p>
-			<p>Click <a href="{url}">here</a> to restart the OAuth flow.</p>`, stripeUserID)
+			<p>Click <a href=/>here</a> to restart the OAuth flow.</p>`, stripeUserID)
 	})
 }
