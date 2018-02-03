@@ -21,7 +21,9 @@ func Create() http.Handler {
 
 	env := &config.Env{DB: db, OauthConfig: oauthConfig}
 
-	mux.Handle("/", oauth.MainPageHandler())
+	mux.Handle("/", oauth.MainPageHandler(`<html><body>
+		<a href="/oauth/stripeLogin">ConnectWithStripe</a>
+		</body></html>`))
 	mux.Handle("/oauth/stripeLogin", oauth.LoginHandler(env))
 	mux.Handle("/oauth/stripe_callback", oauth.CallbackHandler(env))
 	mux.Handle("/oauth/deauthorize", oauth.DeauthorizeHandler(env))
