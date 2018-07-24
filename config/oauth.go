@@ -9,8 +9,8 @@ import (
 func getOauthDev() *oauth2.Config {
 	return &oauth2.Config{
 		RedirectURL:  "http://localhost:65010/oauth/stripe_callback",
-		ClientID:     "ca_CASR50ZBlOjOnrdMaNoav2dcptY7MYx7",
-		ClientSecret: "sk_test_Ycr3oc8bxMC4HGYBE5e3ERaY",
+		ClientID:     os.Getenv("STRIPE_CLIENT_ID"),
+		ClientSecret: os.Getenv("STRIPE_CLIENT_SECRET"),
 		Scopes:       []string{"read_write"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://connect.stripe.com/oauth/authorize",
