@@ -13,7 +13,7 @@ import (
 func Create() http.Handler {
 
 	mux := http.NewServeMux()
-	db, err := config.NewDB("postgres://labuser:testrdstest@yuva-lambada-test.crw7rg7duol4.us-east-1.rds.amazonaws.com/powerdata")
+	db, err := config.NewDB("postgres://postgres:postgres@localhost/powerdata")
 	if err != nil {
 		log.Panic(err)
 	}
